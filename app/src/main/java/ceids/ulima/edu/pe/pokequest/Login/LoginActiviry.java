@@ -25,16 +25,26 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import ceids.ulima.edu.pe.pokequest.BaseActivity;
+import ceids.ulima.edu.pe.pokequest.Codigo.CodigoActiviry;
 import ceids.ulima.edu.pe.pokequest.Menu.MenuActivity;
 import ceids.ulima.edu.pe.pokequest.R;
+import ceids.ulima.edu.pe.pokequest.beans.Correo;
 import ceids.ulima.edu.pe.pokequest.ui.mapa.MapaActivity;
 
 public class LoginActiviry extends BaseActivity{
     private static final String TAG = "EmailPassword";
+    private static DatabaseReference ref;
+    ArrayList<Correo> correo=new ArrayList<>();
 
     // [START declare_auth]
     private FirebaseAuth mAuth;
@@ -181,16 +191,55 @@ public class LoginActiviry extends BaseActivity{
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
-                            Toast.makeText(LoginActiviry.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActiviry.this, "Authentication failed.",Toast.LENGTH_SHORT).show();
                         }else{
-                            Intent mainIntent = new Intent(LoginActiviry.this,MapaActivity.class);
-                            LoginActiviry.this.startActivity(mainIntent);
-                            LoginActiviry.this.finish();
-                            mainIntent.putExtra("correo",mAuth.getCurrentUser().getEmail());
-                            mainIntent.putExtra("foto",mAuth.getCurrentUser().getPhotoUrl());
-                            LoginManager.getInstance().logOut();
-                            startActivity(mainIntent);
+                            String correito=mAuth.getCurrentUser().getEmail().toString();
+                            final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            ref= database.getReference("Correo");
+                            ref.orderByChild("correo").equalTo(correito).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot data : dataSnapshot.getChildren()){
+                                        correo.add(data.getValue(Correo.class));
+                                        //Log.e("+ "");
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Log.w("CulturaActivity", "getUser:onCancelled", databaseError.toException());
+                                }
+                            });
+                            if (correo.size()>0){
+                                Intent mainIntent = new Intent(LoginActiviry.this,CodigoActiviry.class);
+                                LoginActiviry.this.startActivity(mainIntent);
+                                LoginActiviry.this.finish();
+                                mainIntent.putExtra("correo",mAuth.getCurrentUser().getEmail());
+                                mainIntent.putExtra("foto",mAuth.getCurrentUser().getPhotoUrl());
+                                LoginManager.getInstance().logOut();
+                                startActivity(mainIntent);
+                            }else{
+                                for (int i=0; i<=correo.size();i++){
+                                    if (correito.equals(correo.get(i).getCorreo())){
+                                        Intent mainIntent = new Intent(LoginActiviry.this,MapaActivity.class);
+                                        LoginActiviry.this.startActivity(mainIntent);
+                                        LoginActiviry.this.finish();
+                                        mainIntent.putExtra("correo",mAuth.getCurrentUser().getEmail());
+                                        mainIntent.putExtra("foto",mAuth.getCurrentUser().getPhotoUrl());
+                                        LoginManager.getInstance().logOut();
+                                        startActivity(mainIntent);
+                                    }else{
+                                        Intent mainIntent = new Intent(LoginActiviry.this,CodigoActiviry.class);
+                                        LoginActiviry.this.startActivity(mainIntent);
+                                        LoginActiviry.this.finish();
+                                        mainIntent.putExtra("correo",mAuth.getCurrentUser().getEmail());
+                                        mainIntent.putExtra("foto",mAuth.getCurrentUser().getPhotoUrl());
+                                        LoginManager.getInstance().logOut();
+                                        startActivity(mainIntent);
+                                    }
+                                }
+                            }
+
 
 
 

@@ -20,24 +20,24 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
-        <activity android:name=".ui.mapa.MapaActivity"/>
+        <activity android:name=".ui.mapa.MapaActivity" />
         <activity android:name=".ui.reto.RetoActivity" />
         <activity
             android:name=".Splash.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
-
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".Login.LoginActiviry"
+        <activity
+            android:name=".Login.LoginActiviry"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
-        <activity android:name=".Menu.MenuActivity"></activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".Menu.MenuActivity" />
+        <activity android:name=".Codigo.CodigoActiviry"></activity>
     </application>
 
 </manifest>
