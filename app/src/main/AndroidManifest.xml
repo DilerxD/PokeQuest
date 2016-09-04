@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ceids.ulima.edu.pe.pokequest">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -14,15 +16,27 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCm1OcgOo5hqJ7K6F-uAC709FW4O1PKaEk" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
-        <activity android:name=".ui.mapa.MapaActivity">
+        <activity android:name=".ui.mapa.MapaActivity"/>
+        <activity android:name=".ui.reto.RetoActivity" />
+        <activity
+            android:name=".Splash.SplashActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.reto.RetoActivity"></activity>
+
+        <activity android:name=".Login.LoginActiviry"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity android:name=".Menu.MenuActivity"></activity>
     </application>
 
 </manifest>
