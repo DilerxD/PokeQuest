@@ -17,12 +17,20 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_alignTop="@+id/eteSugerencias"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="No podra cambiar luego este codigo"
+        android:layout_above="@+id/eteSugerencias"
+        android:textStyle="bold"/>
     <EditText
         android:id="@+id/eteSugerencias"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:hint="Ingrese su codigo de la universidad"
-        android:inputType="textMultiLine"
+        android:inputType="number"
+        android:maxLength="8"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_above="@+id/btnSugerencia"
