@@ -25,16 +25,27 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import ceids.ulima.edu.pe.pokequest.BaseActivity;
+import ceids.ulima.edu.pe.pokequest.Codigo.CodigoActiviry;
 import ceids.ulima.edu.pe.pokequest.Menu.MenuActivity;
 import ceids.ulima.edu.pe.pokequest.R;
+import ceids.ulima.edu.pe.pokequest.beans.Correo;
 import ceids.ulima.edu.pe.pokequest.ui.mapa.MapaActivity;
 
 public class LoginActiviry extends BaseActivity{
     private static final String TAG = "EmailPassword";
+    private static DatabaseReference ref;
+    ArrayList<Correo> correo=new ArrayList<>();
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     // [START declare_auth]
     private FirebaseAuth mAuth;
@@ -44,12 +55,14 @@ public class LoginActiviry extends BaseActivity{
     private FirebaseAuth.AuthStateListener mAuthListener;
     // [END declare_auth_listener]
     private CallbackManager mCallbackManager;
+    boolean estado=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
+
 
         // [START initialize_auth]
         mAuth = FirebaseAuth.getInstance();
@@ -139,19 +152,6 @@ public class LoginActiviry extends BaseActivity{
 
     private void updateUI(FirebaseUser user) {
         hideProgressDialog();
-        /*if (user != null) {
-
-            findViewById(R.id.email_password_buttons).setVisibility(View.GONE);
-            findViewById(R.id.email_password_fields).setVisibility(View.GONE);
-            findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
-        } else {
-            mStatusTextView.setText(R.string.signed_out);
-            mDetailTextView.setText(null);
-
-            findViewById(R.id.email_password_buttons).setVisibility(View.VISIBLE);
-            findViewById(R.id.email_password_fields).setVisibility(View.VISIBLE);
-            findViewById(R.id.sign_out_button).setVisibility(View.GONE)
-        }*/
     }
 
 
@@ -174,24 +174,63 @@ public class LoginActiviry extends BaseActivity{
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
-                            Toast.makeText(LoginActiviry.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActiviry.this, "Authentication failed.",Toast.LENGTH_SHORT).show();
                         }else{
-                            Intent mainIntent = new Intent(LoginActiviry.this,MapaActivity.class);
-                            LoginActiviry.this.startActivity(mainIntent);
-                            LoginActiviry.this.finish();
-                            mainIntent.putExtra("correo",mAuth.getCurrentUser().getEmail());
-                            mainIntent.putExtra("foto",mAuth.getCurrentUser().getPhotoUrl());
-                            LoginManager.getInstance().logOut();
-                            startActivity(mainIntent);
+                            final String correito=mAuth.getCurrentUser().getEmail().toString();
+                            ref= database.getReference("Correo");
+                            ref.addListenerForSingleValueEvent(new ValueEventListener() {
 
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot data : dataSnapshot.getChildren()){
+                                        correo.add(data.getValue(Correo.class));
+                                    }
+                                    if(correo.size()!=0){
+                                        for(int i=0;i<correo.size();i++){
+                                            if(correo.get(i).getCorreo().equals(correito)){
+                                                estado=false;
+                                                break;
+                                            }
 
+                                        }
+                                        if (estado==false){
+                                            Intent mainIntent = new Intent(LoginActiviry.this,MapaActivity.class);
+                                            LoginActiviry.this.startActivity(mainIntent);
+                                            LoginActiviry.this.finish();
+                                            mainIntent.putExtra("correo",mAuth.getCurrentUser().getEmail());
+                                            mainIntent.putExtra("foto",mAuth.getCurrentUser().getPhotoUrl());
+                                            LoginManager.getInstance().logOut();
+                                            startActivity(mainIntent);
+                                        }else{
+                                            Intent mainIntent = new Intent(LoginActiviry.this,CodigoActiviry.class);
+                                            LoginActiviry.this.startActivity(mainIntent);
+                                            LoginActiviry.this.finish();
+                                            mainIntent.putExtra("correo",mAuth.getCurrentUser().getEmail());
+                                            mainIntent.putExtra("foto",mAuth.getCurrentUser().getPhotoUrl());
+                                            LoginManager.getInstance().logOut();
+                                            startActivity(mainIntent);
+                                        }
+                                    }else{
+                                        Intent mainIntent = new Intent(LoginActiviry.this,CodigoActiviry.class);
+                                        LoginActiviry.this.startActivity(mainIntent);
+                                        LoginActiviry.this.finish();
+                                        mainIntent.putExtra("correo",mAuth.getCurrentUser().getEmail());
+                                        mainIntent.putExtra("foto",mAuth.getCurrentUser().getPhotoUrl());
+                                        LoginManager.getInstance().logOut();
+                                        startActivity(mainIntent);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Log.w("CulturaActivity", "getUser:onCancelled", databaseError.toException());
+                                }
+                            });
 
                         }
 
